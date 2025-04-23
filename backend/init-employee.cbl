@@ -1,0 +1,37 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. INIT-EMP-FILE.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT EMPLOYEE-FILE ASSIGN TO "EMPLOYEE.DAT"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS SEQUENTIAL
+               RECORD KEY IS EMP-ID
+               FILE STATUS IS EMP-FILE-STATUS.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD EMPLOYEE-FILE.
+       01 EMPLOYEE-RECORD.
+           05 EMP-ID           PIC X(10).
+           05 EMP-NAME         PIC X(50).
+           05 EMP-DEPT         PIC X(20).
+           05 EMP-POSITION     PIC X(30).
+           05 EMP-BASIC-SALARY PIC 9(7)V99.
+           05 EMP-JOIN-DATE    PIC X(10).
+           05 EMP-STATUS       PIC X(1).
+
+       WORKING-STORAGE SECTION.
+       01 EMP-FILE-STATUS      PIC XX.
+
+       PROCEDURE DIVISION.
+       BEGIN.
+           OPEN OUTPUT EMPLOYEE-FILE
+           IF EMP-FILE-STATUS = "00"
+               DISPLAY "EMPLOYEE.DAT CREATED SUCCESSFULLY"
+           ELSE
+               DISPLAY "ERROR CREATING FILE: " EMP-FILE-STATUS
+           END-IF
+           CLOSE EMPLOYEE-FILE
+           STOP RUN.

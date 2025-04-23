@@ -1,0 +1,215 @@
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PAYROLL.
+       AUTHOR. Xolani.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT EMPLOYEE-FILE ASSIGN TO "EMPLOYEE.DAT"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS EMP-ID OF EMPLOYEE-RECORD
+               FILE STATUS IS EMP-FILE-STATUS.
+
+           SELECT PAYROLL-FILE ASSIGN TO "PAYROLL.DAT"
+               ORGANIZATION IS INDEXED
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS PAYROLL-KEY
+               FILE STATUS IS PAY-FILE-STATUS.
+
+           SELECT PAYROLL-INFILE ASSIGN TO "PAYROLL.IN"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+           SELECT PAYROLL-OUTFILE ASSIGN TO "PAYROLL.OUT"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+
+       FD EMPLOYEE-FILE.
+       01 EMPLOYEE-RECORD.
+          05 EMP-ID               PIC X(10).
+          05 EMP-NAME             PIC X(50).
+          05 EMP-DEPT             PIC X(20).
+          05 EMP-POSITION         PIC X(30).
+          05 EMP-BASIC-SALARY     PIC 9(7)V99.
+          05 EMP-JOIN-DATE        PIC X(10).
+          05 EMP-STATUS           PIC X(1).
+
+       FD PAYROLL-FILE.
+       01 PAYROLL-RECORD.
+          05 PAYROLL-KEY.
+             10 EMP-ID            PIC X(10).
+             10 PAY-DATE          PIC X(10).
+          05 PAY-DETAILS.
+             10 BASIC-PAY         PIC 9(7)V99.
+             10 OVERTIME-PAY      PIC 9(7)V99.
+             10 BONUS-PAY         PIC 9(7)V99.
+             10 LEAVE-DAYS        PIC 99.
+             10 GROSS-PAY         PIC 9(7)V99.
+             10 TAX-AMOUNT        PIC 9(7)V99.
+             10 OTHER-DEDUCTIONS  PIC 9(7)V99.
+             10 NET-PAY           PIC 9(7)V99.
+             10 PAY-STATUS        PIC X(1).
+                88 PAY-GENERATED              VALUE 'G'.
+                88 PAY-PAID                   VALUE 'P'.
+
+       FD PAYROLL-INFILE.
+       01 PAYROLL-IN-RECORD       PIC X(32).
+
+       FD PAYROLL-OUTFILE.
+       01 PAYROLL-OUT-RECORD      PIC X(120).
+
+       WORKING-STORAGE SECTION.
+       01 EMP-FILE-STATUS         PIC XX.
+       01 PAY-FILE-STATUS         PIC XX.
+       01 WS-EOF                  PIC X       VALUE 'N'.
+          88 END-OF-FILE                      VALUE 'Y'.
+          88 NOT-END-OF-FILE                  VALUE 'N'.
+
+       01 WS-INPUT-DATA.
+          05 INP-EMP-ID           PIC X(10).
+          05 INP-LEAVE-DAYS       PIC 99.
+          05 INP-OVERTIME-HRS     PIC 999.
+          05 INP-BONUS-AMOUNT     PIC 9(7)V99.
+          05 INP-PAY-DATE         PIC X(10).
+
+       01 WS-CALCULATIONS.
+          05 WS-TAX-RATE          PIC V999    VALUE 0.15.
+          05 WS-OVERTIME-RATE     PIC 999V99  VALUE 200.00.
+          05 WS-LEAVE-DEDUCTION   PIC 9(7)V99.
+          05 WS-DAILY-RATE        PIC 9(7)V99.
+
+       01 WS-OUTPUT-MSG.
+          05 FILLER               PIC X(20)   VALUE
+                "NET PAY FOR EMP ID: ".
+          05 OUT-EMP-ID           PIC X(10).
+          05 FILLER               PIC X(5)    VALUE " IS: ".
+          05 OUT-NET-PAY-NUM      PIC 9(7)V99.
+          05 OUT-NET-PAY REDEFINES
+                OUT-NET-PAY-NUM   PIC 9(7)V99.
+
+          05 FILLER               PIC X(77)   VALUE SPACES.
+
+       PROCEDURE DIVISION.
+
+       MAIN-LOGIC.
+           PERFORM INITIALIZE-PROGRAM
+           PERFORM PROCESS-PAYROLL UNTIL END-OF-FILE
+           PERFORM CLOSE-FILES
+           STOP RUN.
+
+       INITIALIZE-PROGRAM.
+           OPEN INPUT PAYROLL-INFILE
+           OPEN OUTPUT PAYROLL-OUTFILE
+           OPEN I-O EMPLOYEE-FILE
+              PAYROLL-FILE
+
+           IF EMP-FILE-STATUS NOT = '00'
+              MOVE "ERROR OPENING EMPLOYEE FILE" TO PAYROLL-OUT-RECORD
+              PERFORM WRITE-OUTPUT
+              MOVE 'Y' TO WS-EOF
+           END-IF
+
+           IF PAY-FILE-STATUS NOT = '00'
+              MOVE "ERROR OPENING PAYROLL FILE" TO PAYROLL-OUT-RECORD
+              PERFORM WRITE-OUTPUT
+              MOVE 'Y' TO WS-EOF
+           END-IF
+
+           PERFORM READ-INPUT-FILE.
+
+       READ-INPUT-FILE.
+           READ PAYROLL-INFILE
+           AT END
+              MOVE 'Y' TO WS-EOF
+           NOT AT END
+               PERFORM PARSE-INPUT-DATA
+           END-READ.
+
+       PARSE-INPUT-DATA.
+           MOVE PAYROLL-IN-RECORD(1:10) TO INP-EMP-ID
+           MOVE PAYROLL-IN-RECORD(11:2) TO INP-LEAVE-DAYS
+           MOVE PAYROLL-IN-RECORD(13:3) TO INP-OVERTIME-HRS
+           COMPUTE INP-BONUS-AMOUNT =
+              FUNCTION NUMVAL(PAYROLL-IN-RECORD(16:7)) / 100
+           MOVE PAYROLL-IN-RECORD(23:10) TO INP-PAY-DATE.
+
+       PROCESS-PAYROLL.
+           PERFORM GET-EMPLOYEE-RECORD
+           IF EMP-STATUS = 'A'
+              PERFORM CALCULATE-PAY
+              PERFORM WRITE-PAYROLL-RECORD
+              PERFORM DISPLAY-RESULTS
+           ELSE
+              MOVE "EMPLOYEE INACTIVE" TO PAYROLL-OUT-RECORD
+              PERFORM WRITE-OUTPUT
+           END-IF
+           PERFORM READ-INPUT-FILE.
+
+       GET-EMPLOYEE-RECORD.
+           MOVE INP-EMP-ID TO EMP-ID OF EMPLOYEE-RECORD
+           READ EMPLOYEE-FILE
+           INVALID KEY
+                   MOVE "EMPLOYEE NOT FOUND" TO PAYROLL-OUT-RECORD
+                   PERFORM WRITE-OUTPUT
+                   MOVE 'Y' TO WS-EOF
+           END-READ.
+
+       CALCULATE-PAY.
+           COMPUTE EMP-BASIC-SALARY = EMP-BASIC-SALARY
+           COMPUTE WS-DAILY-RATE = EMP-BASIC-SALARY / 30
+           COMPUTE WS-LEAVE-DEDUCTION = WS-DAILY-RATE * INP-LEAVE-DAYS
+           COMPUTE OVERTIME-PAY = INP-OVERTIME-HRS * WS-OVERTIME-RATE
+           
+           MOVE INP-BONUS-AMOUNT TO BONUS-PAY
+           MOVE EMP-BASIC-SALARY TO BASIC-PAY
+           MOVE INP-LEAVE-DAYS TO LEAVE-DAYS
+           
+           COMPUTE GROSS-PAY = BASIC-PAY + OVERTIME-PAY + BONUS-PAY
+              - WS-LEAVE-DEDUCTION
+           COMPUTE TAX-AMOUNT = GROSS-PAY * WS-TAX-RATE
+           COMPUTE NET-PAY = GROSS-PAY - TAX-AMOUNT
+           MOVE 'G' TO PAY-STATUS.
+
+       WRITE-PAYROLL-RECORD.
+           MOVE INP-EMP-ID TO EMP-ID OF PAYROLL-KEY
+           MOVE INP-PAY-DATE TO PAY-DATE OF PAYROLL-KEY
+           WRITE PAYROLL-RECORD
+           INVALID KEY
+                   MOVE "ERROR WRITING PAYROLL RECORD"
+                      TO PAYROLL-OUT-RECORD
+                   PERFORM WRITE-OUTPUT
+           END-WRITE.
+
+       DISPLAY-RESULTS.
+           MOVE INP-EMP-ID TO OUT-EMP-ID
+           MOVE NET-PAY TO OUT-NET-PAY-NUM
+           MOVE WS-OUTPUT-MSG TO PAYROLL-OUT-RECORD
+           
+      *    Add formatted output for API consumption
+           STRING
+              EMP-ID OF PAYROLL-KEY DELIMITED BY SIZE
+              PAY-DATE OF PAYROLL-KEY DELIMITED BY SIZE
+              BASIC-PAY DELIMITED BY SIZE
+              OVERTIME-PAY DELIMITED BY SIZE
+              BONUS-PAY DELIMITED BY SIZE
+              LEAVE-DAYS DELIMITED BY SIZE
+              GROSS-PAY DELIMITED BY SIZE
+              TAX-AMOUNT DELIMITED BY SIZE
+              OTHER-DEDUCTIONS DELIMITED BY SIZE
+              NET-PAY DELIMITED BY SIZE
+              PAY-STATUS DELIMITED BY SIZE
+              INTO PAYROLL-OUT-RECORD
+           
+           PERFORM WRITE-OUTPUT.
+
+       WRITE-OUTPUT.
+           WRITE PAYROLL-OUT-RECORD.
+
+       CLOSE-FILES.
+           CLOSE PAYROLL-INFILE
+                 PAYROLL-OUTFILE
+                 EMPLOYEE-FILE
+                 PAYROLL-FILE.
