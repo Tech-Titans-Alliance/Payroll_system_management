@@ -16,15 +16,17 @@ const Dashboard = () => {
     departmentCount: 5,
     monthlyPay: 250000,
     payslipsIssued: 25,
+    activeEmployees: 3,
+    inactiveEmployees: 2,
   };
 
   const chartData = [
-    { name: 'Employees', value: dashboardData.totalEmployees },
+    { name: 'Active Employees', value: dashboardData.activeEmployees },
     { name: 'Departments', value: dashboardData.departmentCount },
-    { name: 'Payslips', value: dashboardData.payslipsIssued },
+    { name: 'Inactive Employees', value: dashboardData.inactiveEmployees },
   ];
 
-  const chartColors = ['#4e8cff', '#34c38f', '#ffbb44']; // Different colors for each bar
+  const chartColors = ['#34c38f', '#007bff', '#b5121b'];
 
   return (
     <div style={styles.container}>
@@ -33,11 +35,21 @@ const Dashboard = () => {
 
       {/* Dashboard Cards */}
       <div style={styles.cardsWrapper}>
-        <DashboardCard label="👥 Total Employees" value={dashboardData.totalEmployees} link="/employees" />
-        <DashboardCard label="🏢 Departments" value={dashboardData.departmentCount} link="/departments" />
-        <DashboardCard label="💰 Monthly Pay" value={`R${dashboardData.monthlyPay.toLocaleString()}`} link="/monthly-pay" />
-        <DashboardCard label="📄 Payslips Issued" value={dashboardData.payslipsIssued} link="/payslips" />
-        <DashboardCard label="📋 Reports" value="View Reports" link="/payroll-report" />
+        <DashboardCard
+          label="👥 Total Employees"
+          value={dashboardData.totalEmployees}
+          link="/employees"
+        />
+        <DashboardCard
+          label="📋 Reports"
+          value="View Reports"
+          link="/payroll-report"
+        />
+        <DashboardCard
+          label="💼 Payroll Form"
+          value="Create Payroll"
+          link="/process-payroll"
+        />
       </div>
 
       {/* Chart */}
@@ -50,7 +62,10 @@ const Dashboard = () => {
             <Tooltip />
             <Bar dataKey="value" radius={[6, 6, 0, 0]}>
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={chartColors[index % chartColors.length]}
+                />
               ))}
             </Bar>
           </BarChart>
@@ -60,24 +75,27 @@ const Dashboard = () => {
   );
 };
 
-const DashboardCard = ({ label, value, link }) => (
-  <Link to={link} style={styles.cardLink}>
-    <div style={styles.card}>
-      <h4 style={styles.cardTitle}>{label}</h4>
-      <p style={styles.cardValue}>{value}</p>
-    </div>
-  </Link>
-);
+const DashboardCard = ({ label, value, link }) => {
+  return (
+    <Link to={link} style={styles.cardLink}>
+      <div style={styles.card}>
+        <h4 style={styles.cardTitle}>{label}</h4>
+        <p style={styles.cardValue}>{value}</p>
+      </div>
+    </Link>
+  );
+};
 
 const styles = {
   container: {
     padding: '20px',
     fontFamily: 'Segoe UI, sans-serif',
+    backgroundColor: '#f4f7fb',
   },
   title: {
     textAlign: 'center',
     marginBottom: '5px',
-    color: '#4e8cff', // updated title color
+    color: '#b5121b',
   },
   subtitle: {
     textAlign: 'center',
@@ -97,13 +115,14 @@ const styles = {
     maxWidth: '240px',
   },
   card: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#fff',
     borderRadius: '12px',
     padding: '20px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
     textAlign: 'center',
-    transition: 'all 0.3s ease-in-out',
     cursor: 'pointer',
+    borderLeft: '6px solid #b5121b',
+    transition: 'background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease',
   },
   cardTitle: {
     fontSize: '16px',
@@ -127,7 +146,13 @@ const styles = {
     marginBottom: '20px',
     color: '#444',
   },
+  cardHover: {
+    backgroundColor: '#f9f9f9',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.1)',
+    transform: 'scale(1.05)',
+  }
 };
 
 export default Dashboard;
+
 
