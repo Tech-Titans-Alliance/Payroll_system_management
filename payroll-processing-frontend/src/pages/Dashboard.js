@@ -12,7 +12,7 @@ import {
 
 const Dashboard = () => {
   const dashboardData = {
-    totalEmployees: 5,
+    totalEmployees: 4,
     departmentCount: 5,
     monthlyPay: 250000,
     payslipsIssued: 25,
@@ -26,7 +26,11 @@ const Dashboard = () => {
     { name: 'Inactive Employees', value: dashboardData.inactiveEmployees },
   ];
 
-  const chartColors = ['#34c38f', '#007bff', '#b5121b'];
+  const chartColors = [
+    'rgba(22, 163, 74, 0.8)',  // Active Employees (Updated Color)
+    '#007bff',                 // Departments
+    '#b5121b',                 // Inactive Employees
+  ];
 
   return (
     <div style={styles.container}>
@@ -64,7 +68,7 @@ const Dashboard = () => {
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={chartColors[index % chartColors.length]}
+                  fill={chartColors[index % chartColors.length]}  // Applying the updated color
                 />
               ))}
             </Bar>

@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 const allowedEmails = [
   'ngwenyaasanda13@gmail.com',
   'rolivhuwamuzila@gmail.com',
-  'Atlehangasemela@gmail.com',
+  'atlehangsemela@gmail.com',
   'xolanisyav04@gmail.com',
-  'Palesaclaudia2@gmail.com',
+  'palesaclaudia2@gmail.com',
   'Rokhuda.Tshitimbi@capaciti.org.za'
 ];
 
