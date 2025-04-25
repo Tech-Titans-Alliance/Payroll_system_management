@@ -10,7 +10,7 @@ body {
   
   .main {
     flex: 1;
-    padding: 20px;
+    padding: 0px;
   }
   
   input, select {
@@ -28,7 +28,66 @@ body {
     cursor: pointer;
   }
 
- 
+ /* PAYROLL REPORT STYLING
+/* Grid Table 4 - Accent 6 style */
+.table-grid-accent-6 {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.table-grid-accent-6 th,
+.table-grid-accent-6 td {
+  padding: 12px 20px;
+  text-align: left;
+  border: 1px solid #d9d9d9; /* Light gray border */
+}
+
+.table-grid-accent-6 th {
+  background-color: #388558; /* Accent color (light blue) */
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+}
+
+.table-grid-accent-6 tr:nth-child(even) {
+  background-color: #d2faba; /* Light gray background for even rows */
+}
+
+.table-grid-accent-6 tr:hover {
+  background-color: #b8ffea; /* Darker gray on hover */
+}
+
+.table-grid-accent-6 td {
+  color: #333333; /* Dark gray text */
+}
+
+.table-grid-accent-6 .table-header {
+  background-color: #0076b6; /* Dark blue background for header */
+  color: white;
+  font-weight: bold;
+}
+.charts-row {
+  align-items: flex-start; /* Align charts to the top for natural appearance */
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 0px; /* Remove bottom margin for better alignment */
+  margin-top: 40px;
+}
+
+.chart-box {
+  max-width: 400px;
+  min-width: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content for better alignment */
+  height: 300px; /* Allow height to adjust naturally */
+}
+
+.chart-box canvas {
+  max-width: 100% !important;
+  height: auto !important;
+} 
+
  
   
   

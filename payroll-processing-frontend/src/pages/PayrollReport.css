@@ -1,0 +1,81 @@
+.payroll-report-container {
+  padding: 1.5rem;
+  background-color: #f6f1fd;
+  color: #065f46;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.payroll-report-container h2 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 1.25rem;
+}
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 300px; /* Adjust this value as needed */
+  border: 1px solid #fafafa;
+}
+
+.payroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px; /* Helps prevent cramping on small viewports */
+  table-layout: fixed;
+}
+
+.payroll-table thead {
+  background-color: #d1fae5;
+}
+
+.payroll-table th,
+.payroll-table td {
+  border: 1px solid #a7f3d0;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.chart-section {
+  margin-bottom: 2rem;
+  max-width: 600px; /* limits width of the chart */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chart-section canvas {
+  max-width: 100% !important;
+  height: 300px !important; /* smaller height */
+}
+
+.chart-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #065f46;
+}
+.charts-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap; /* For responsive fallback */
+  margin-bottom: 2rem;
+}
+
+.chart-box {
+  flex: 1;
+  max-width: 300px; /* Adjust as needed */
+  min-width: 250px;
+}
+
+.chart-box canvas {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+.loading-spinner,
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  font-weight: bold;
+  color: #b91c1c;
+}
