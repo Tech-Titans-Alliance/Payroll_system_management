@@ -39,6 +39,7 @@ Before you start, make sure you have the following:
    ```bash
    cd payroll-processing-frontend
    npm install
+   npm start
    ```
 
 3. **COBOL Setup (Backend)**:
