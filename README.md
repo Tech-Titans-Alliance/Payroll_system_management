@@ -96,7 +96,7 @@ Before you start, make sure you have the following:
 ## 📑 **Features & Flow**
 
 ### 1. **Login Page** 🔐:
-   - Enter your email to receive a verification code.
+   - Enter your email to receive a verification code. (NB!!! the email input is CASE sensetive, ensure you put a correct format for your email).
    - After entering the code, you'll be directed to the **Dashboard**.
 
 ### 2. **Dashboard** 📊:
